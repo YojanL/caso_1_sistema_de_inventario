@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+
+
+// Verifica que el usuario haya iniciado sesión
+if (empty($_SESSION['id_usuario'])) {
+    header('Location: ../index.html');
+    exit();
+}
+?>
 <!doctype html>
 <html lang="es">
 <head>

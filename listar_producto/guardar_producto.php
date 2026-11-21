@@ -1,6 +1,6 @@
 <?php
 // guardar_producto.php
-require_once 'conexion.php';
+require_once __DIR__ . '/../conexion.php';
 
 
 
@@ -100,7 +100,7 @@ if ($errores)
     }
 
     echo '</ul>';
-    echo '<a href="index.html">Volver</a>';
+    echo '<a href="listar_producto\registrar_producto.php">Volver</a>';
     exit;
 }
 

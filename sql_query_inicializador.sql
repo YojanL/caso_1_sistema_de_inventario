@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS productos (
     fecha_registro TIMESTAMP
     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_categoria INT NOT NULL,
+    estado BOOLEAN DEFAULT TRUE,
     
     CONSTRAINT fk_producto_categoria
     	FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)

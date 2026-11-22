@@ -1,34 +1,39 @@
 <?php
 // listar_productos.php
+
+session_start();
+
+if (empty($_SESSION['id_usuario'])) {
+    header('Location: ../index.html');
+    exit();
+}
+
 require_once __DIR__ . '/../conexion.php';
 
-
-// 1. Leer filtros desde GET
 $buscar      = trim($_GET['buscar'] ?? '');
 $categoriaId = trim($_GET['categoria'] ?? '');
 $estadoStock = trim($_GET['estado'] ?? '');
 $disponible  = trim($_GET['disponible'] ?? '');
 
-// 2. Obtener categorías para el <select>
 $categorias = $pdo
     ->query('SELECT id_categoria, nombre FROM categorias ORDER BY nombre ASC')
     ->fetchAll();
 
-// 3. Construir consulta base y filtros dinámicos
-$sql = 'SELECT
-            p.id_producto,
-            p.codigo,
-            p.nombre,
-            p.descripcion,
-            p.id_categoria,
-            c.nombre AS categoria,
-            p.precio,
-            p.stock_actual,
-            p.stock_minimo,
-            p.estado
-        FROM productos p
-        INNER JOIN categorias c
-            ON c.id_categoria = p.id_categoria';
+$sql =
+    'SELECT
+        p.id_producto,
+        p.codigo,
+        p.nombre,
+        p.descripcion,
+        p.id_categoria,
+        c.nombre AS categoria,
+        p.precio,
+        p.stock_actual,
+        p.stock_minimo,
+        p.estado
+    FROM productos p
+    INNER JOIN categorias c
+        ON c.id_categoria = p.id_categoria';
 
 $where  = [];
 $params = [];
@@ -62,10 +67,17 @@ if (!empty($where)) {
 
 $sql .= ' ORDER BY p.id_producto DESC';
 
-// 4. Ejecutar consulta preparada
 $sentencia = $pdo->prepare($sql);
 $sentencia->execute($params);
 $productos = $sentencia->fetchAll();
+
+$hayStockBajo = false;
+foreach ($productos as $p) {
+    if ((int) $p['stock_actual'] < (int) $p['stock_minimo']) {
+        $hayStockBajo = true;
+        break;
+    }
+}
 ?>
 <!doctype html>
 <html lang="es">
@@ -99,7 +111,7 @@ $productos = $sentencia->fetchAll();
                         </div>
                         <div class="col-sm-5 mb-3">
                             <label class="form-label">Estado</label>
-                            <select class ="form-select" name="edit_estado" id="edit_estado" required>
+                            <select class="form-select" name="edit_estado" id="edit_estado" required>
                                 <option value="1">En Venta</option>
                                 <option value="0">Retirado</option>
                             </select>
@@ -182,14 +194,14 @@ modalEditar.addEventListener('show.bs.modal', function (event) {
                     <div class="alert alert-success">Producto editado correctamente.</div>
                 <?php endif; ?>
 
+                <?php if ($hayStockBajo): ?>
+                    <div class="alert alert-danger">Hay productos con bajo nivel de stock.</div>
+                <?php endif; ?>
+
                 <!-- Formulario de filtros -->
                 <form method="get" class="row g-2 mb-4">
                     <div class="col-md-5">
-                        <input type="text"
-                            name="buscar"
-                            class="form-control"
-                            placeholder="Buscar por código o nombre..."
-                            value="<?= htmlspecialchars($buscar, ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="text" name="buscar" class="form-control" autocomplete="off" placeholder="Buscar por código o nombre..." value="<?= htmlspecialchars($buscar, ENT_QUOTES, 'UTF-8') ?>">
                     </div>
                     <div class="col-md-3">
                         <select name="categoria" class="form-select text-muted">
@@ -226,7 +238,7 @@ modalEditar.addEventListener('show.bs.modal', function (event) {
                     </div>
                 </form>
 
-                <table border="1" class="table table-striped table-bordered table-hover">
+                <table border="1" class="table table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
                             <th></th>
@@ -241,7 +253,7 @@ modalEditar.addEventListener('show.bs.modal', function (event) {
                     </thead>
                     <tbody>
                         <?php foreach ($productos as $producto): ?>
-                        <tr>
+                        <tr class="<?= ((int) $producto['stock_actual'] < (int) $producto['stock_minimo']) ? 'table-danger' : '' ?>">
                             <td>
                                 <button type="button"
                                     class="btn btn-sm btn-outline-primary btn-editar bi bi-pencil-square"
@@ -256,7 +268,6 @@ modalEditar.addEventListener('show.bs.modal', function (event) {
                                     data-stock-minimo="<?= (int) $producto['stock_minimo'] ?>"
                                     data-descripcion="<?= htmlspecialchars((string) ($producto['descripcion'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                                     data-estado="<?= ((int) $producto['estado'] === 1) ? '1' : '0' ?>">
-                                    
                                 </button>
                             </td>
                             <td>
@@ -317,11 +328,19 @@ modalEditar.addEventListener('show.bs.modal', function (event) {
                     </tbody>
                 </table>
 
-                <p>
-                    <a href="registrar_producto.php">
-                        Registrar otro producto
-                    </a>
-                </p>
+                <div class="col-12 d-flex gap-2">
+                    <p>
+                        <a href="registrar_producto.php" class="btn btn-outline-primary">
+                            Registrar un producto nuevo
+                        </a>
+                    </p>
+                    <p>
+                        <a href="registro_movimientos.php" class="btn btn-outline-secondary">Registrar Movimiento</a>
+                    </p>
+                    <p>
+                        <a href="listar_movimientos.php" class="btn btn-outline-dark">Ver Movimientos</a>
+                    </p>
+                </div>
             </div>
         </div>
     </main>

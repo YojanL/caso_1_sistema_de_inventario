@@ -14,7 +14,7 @@ $usuarioIngresado = trim($_POST['usuario'] ?? '');
 $clavePlana = $_POST['clave'] ?? '';
 
 $sql = 
-    'SELECT id_usuario, nombre, correo, clave, estado FROM usuarios WHERE nombre = :nombreUsuario';
+    'SELECT id_usuario, nombre, correo, clave, estado FROM admins WHERE nombre = :nombreUsuario';
 
 
 try {
@@ -34,7 +34,7 @@ try {
             $_SESSION['correo_usuario'] = $usuario['correo'];
 
             // Redirigir al panel principal del sistema de inventario
-            header("Location: listar_producto/registrar_producto.php");
+            header("Location: listar_producto/listar_productos.php");
             exit();
         } else {
             echo "<script>alert('Correo o contraseña incorrectos.'); window.location.href='index.html';</script>";

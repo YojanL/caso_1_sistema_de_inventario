@@ -33,12 +33,12 @@ CREATE TABLE IF NOT EXISTS productos (
 );
 
 
-CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE IF NOT EXISTS admins (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     correo VARCHAR(100) NOT NULL UNIQUE,
     clave VARCHAR(255) NOT NULL,
-    estado BOOLEAN DEFAULT TRUE -- se asume que el estado del usuario es true (activo)
+    estado BOOLEAN DEFAULT TRUE -- se asume que el estado del admin es true (activo)
 );
 
 
@@ -51,6 +51,15 @@ CREATE TABLE IF NOT EXISTS tipo_movimiento (
 INSERT IGNORE INTO tipo_movimiento (nombre, descripcion) VALUES
 	('Entrada', 'Este producto entro en el inventario (Restock de productos, devoluciones, etc.)'),
     ('Salida', 'Este producto salio del inventario (Venta, producto en mal estado, etc)');
+
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL UNIQUE,
+    correo VARCHAR(255),
+    estado BOOLEAN DEFAULT TRUE,
+    proveedor BOOLEAN DEFAULT FALSE -- Considera por default que el usuario no es proveedor
+);
 
 
 CREATE TABLE IF NOT EXISTS movimientos (

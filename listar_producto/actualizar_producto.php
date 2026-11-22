@@ -16,19 +16,12 @@ require_once __DIR__ . '/../conexion.php';
 
 
 $idProducto = trim($_POST['id_producto'] ?? '');
-
 $nombre = trim($_POST['edit_nombre'] ?? '');
-
 $categoriaId = trim($_POST['categoria_id'] ?? '');
-
 $precio = trim($_POST['precio'] ?? '');
-
 $stockActual = trim($_POST['stock_actual'] ?? '');
-
 $stockMinimo = trim($_POST['stock_minimo'] ?? '');
-
 $descripcion = trim($_POST['descripcion'] ?? '');
-
 $estado = trim($_POST['edit_estado'] ?? '');
 
 

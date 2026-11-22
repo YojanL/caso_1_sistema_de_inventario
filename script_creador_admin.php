@@ -11,7 +11,7 @@ $claveSegura = password_hash($clavePlana, PASSWORD_DEFAULT);
 
 $sql = 
     'INSERT INTO 
-        usuarios (nombre, correo, clave) 
+        admins (nombre, correo, clave) 
     VALUES 
         (:nombreUsuario, :correo, :clave)';
 
